@@ -1,7 +1,4 @@
 <?php
-
-use Illuminate\Support\Facades\Route;
-
-Route::get('/', function () {
-    return view('welcome');
-});
+require __DIR__.'/domains/shop.php';
+require __DIR__.'/domains/admin.php';
+require __DIR__.'/domains/api.php';

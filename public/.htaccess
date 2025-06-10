@@ -22,4 +22,10 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+
+    # 如果請求/phpmyadmin，以及請求來源不是本機，則回傳 403 Forbidden
+    RewriteCond %{REQUEST_URI} ^/phpmyadmin
+    RewriteCond %{REMOTE_ADDR} !^127\.0\.0\.1
+    RewriteCond %{REMOTE_ADDR} !^::1
+    RewriteRule ^ - [F,L]
 </IfModule>

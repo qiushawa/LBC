@@ -123,4 +123,10 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'domains' =>[
+        'admin' => env('APP_ADMIN_DOMAIN', 'admin.qiushawa.studio'),
+        'api' => env('APP_API_DOMAIN', 'api.qiushawa.studio'),
+        'web' => env('APP_WEB_DOMAIN', 'qiushawa.studio'),
+    ]
+
 ];
