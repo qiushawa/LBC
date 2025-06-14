@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\AdController;
+
 use Illuminate\Support\Facades\Route;
 
 $domain = config('app.domains.admin', 'admin.qiushawa.studio');
@@ -56,7 +57,7 @@ Route::domain($domain)->group(function () {
 
             // 庫存查詢
             Route::get('/dashboard/inventorySearch', [DashboardController::class, 'inventorySearch'])->name('admin.inventory.search');
-        
+
         });
 
 

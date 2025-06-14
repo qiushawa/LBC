@@ -23,13 +23,17 @@ class Order extends Model
         'service_id',
     ];
 
-    public function assemblyService()
+    public function user()
     {
-        return $this->belongsTo(AssemblyService::class, 'service_id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function orderDetails()
+    public function details()
     {
-        return $this->hasMany(OrderDetail::class, 'order_id');
+        return $this->hasMany(OrderDetail::class, 'order_id', 'order_id');
+    }
+    public function assemblyService()
+    {
+        return $this->belongsTo(AssemblyService::class, 'service_id', 'service_id');
     }
 }

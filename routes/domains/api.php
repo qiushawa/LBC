@@ -15,4 +15,10 @@ Route::domain('api.qiushawa.studio')->group(function () {
     Route::get('/status/online', [ApiController::class, 'getOnlineUsers'])
         ->name('status.online');
 
+    // 需要登入的路由
+    Route::middleware(['auth:sanctum'])->group(function () {
+        // 送出CustomConfiguration
+
+    });
+
 });

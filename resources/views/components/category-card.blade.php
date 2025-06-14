@@ -4,7 +4,7 @@
         <div class="flex-1">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xl font-semibold text-gray-900">{{ $category->category_name }}</h2>
-                <button onclick="openAddOnModal('{{ $category->category_id }}')" class="add-on-button px-3 py-1.5 bg-accent text-white rounded-md text-sm hover:bg-blue-700">加購選項</button>
+                
             </div>
             <div class="md:w-full">
                 <div class="product-select-container" data-category-id="{{ $category->category_id }}" data-category-icon="{{ $category->category_icon }}">

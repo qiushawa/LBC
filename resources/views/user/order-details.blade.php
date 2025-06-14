@@ -1,45 +1,8 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>訂單詳情 - 讓兄弟組</title>
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,700&display=swap" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>
-        :root {
-            --primary: #1e3a8a;
-            --secondary: #111827;
-            --accent: #2563eb;
-            --success: #10b981;
-            --error: #ef4444;
-        }
-        .header-gradient { background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); }
-        .sidebar-link { transition: background-color 0.3s ease, color 0.3s ease; }
-        .sidebar-link:hover { background-color: rgba(37, 99, 235, 0.1); color: var(--accent); }
-        .order-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .order-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); }
-    </style>
-</head>
-<body class="antialiased text-gray-900 bg-gray-100 font-figtree">
-    <div class="flex flex-col min-h-screen">
-        <!-- Header -->
-        <x-header title="讓兄弟組 - 打造你的夢想電腦" />
+@extends('layouts.dashboard')
 
-        <!-- Main Content -->
-        <main class="flex-1 px-6 py-8 mx-auto max-w-7xl">
-            <div class="flex flex-col gap-8 lg:flex-row">
-                <!-- Sidebar -->
-                <aside class="p-6 bg-white shadow-sm lg:w-1/4 rounded-xl">
-                    <h3 class="mb-4 text-lg font-semibold text-gray-900">帳戶管理</h3>
-                    <nav class="space-y-2">
-                        <a href="{{ route('user.profile') }}" class="block px-4 py-2 font-medium text-gray-700 rounded-lg sidebar-link hover:bg-accent/10 hover:text-accent">個人資料</a>
-                        <a href="{{ route('user.orders') }}" class="block px-4 py-2 font-medium text-gray-700 rounded-lg sidebar-link bg-accent/10 text-accent">訂單紀錄</a>
-                        <a href="{{ route('user.settings') }}" class="block px-4 py-2 font-medium text-gray-700 rounded-lg sidebar-link hover:bg-accent/10 hover:text-accent">帳戶設定</a>
-                    </nav>
-                </aside>
+@section('title', '訂單紀錄')
 
+@section('content')
                 <!-- Order Details Content -->
                 <div class="lg:w-3/4">
                     <div class="p-8 transition-all bg-white shadow-sm order-card rounded-xl hover:shadow-md">
@@ -54,11 +17,17 @@
                         <div class="grid grid-cols-1 gap-6 mb-6 sm:grid-cols-2">
                             <div>
                                 <p class="text-sm font-medium text-gray-700">訂單日期</p>
-                                <p class="text-gray-600">{{ $order->order_date->format('Y-m-d H:i') }}</p>
+                                <p class="text-gray-600">{{ $order->order_date }}</p>
                             </div>
                             <div>
                                 <p class="text-sm font-medium text-gray-700">付款狀態</p>
-                                <p class="text-gray-600">{{ __('payment_status.' . $order->payment_status) }}</p>
+                                @if ($order->payment_status == "未付款")
+                                    <p class="text-red-600">{{ $order->payment_status }}</p>
+                                @elseif ($order->payment_status == "已付款")
+                                    <p class="text-green-600">{{ $order->payment_status }}</p>
+                                @else
+                                    <p class="text-gray-600">{{ $order->payment_status }}</p>
+                                @endif
                             </div>
                             <div>
                                 <p class="text-sm font-medium text-gray-700">收貨人</p>
@@ -80,13 +49,13 @@
                             @foreach ($order->orderDetails as $detail)
                                 <div class="flex justify-between py-4 border-b border-gray-200">
                                     <div>
-                                        <p class="text-sm font-medium text-gray-700">{{ $detail->product->product_name }}</p>
-                                        <p class="text-sm text-gray-600">數量：{{ $detail->quantity }}</p>
-                                        @if ($detail->discount)
-                                            <p class="text-sm text-success">折扣：{{ $detail->discount->discount_name }} (NT${{ $detail->discount_amount }})</p>
+                                        <p class="text-sm font-medium text-gray-700">{{ $detail['product']->product_name }}</p>
+                                        <p class="text-sm text-gray-600">數量：{{ $detail['quantity'] }}</p>
+                                        @if ($detail['discount_amount'])
+                                            <p class="text-sm text-success">折扣：{{ $detail['discount_amount'] }} (NT${{ number_format($detail['discount_amount']) }})</p>
                                         @endif
                                     </div>
-                                    <p class="text-sm font-medium text-gray-900">NT${{ number_format($detail->subtotal) }}</p>
+                                    <p class="text-sm font-medium text-gray-900">NT${{ number_format($detail['subtotal']) }}</p>
                                 </div>
                             @endforeach
                         </div>
@@ -125,18 +94,6 @@
         </main>
 
         <!-- Footer -->
-        <footer class="py-6 text-white bg-secondary">
-            <div class="px-6 mx-auto max-w-7xl">
-                <div class="flex flex-col items-center justify-between sm:flex-row">
-                    <p>© 2025 讓兄弟組. All rights reserved.</p>
-                    <div class="flex mt-4 space-x-4 sm:mt-0">
-                        <a href="#" class="hover:text-gray-300">關於我們</a>
-                        <a href="#" class="hover:text-gray-300">聯繫我們</a>
-                        <a href="#" class="hover:text-gray-300">隱私政策</a>
-                    </div>
-                </div>
-            </div>
-        </footer>
+
     </div>
-</body>
-</html>
+@endsection

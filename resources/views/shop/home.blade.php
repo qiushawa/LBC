@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>讓兄弟組</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,600,700&display=swap" rel="stylesheet">
@@ -13,42 +15,54 @@
             --secondary: #1f2937;
             --accent: #3b82f6;
         }
+
         .category-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+
         .category-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
+
         .add-on-button {
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
+
         .add-on-button:hover {
             transform: scale(1.05);
         }
+
         .product-options {
             background: white;
         }
+
         .product-options li:hover {
             background: #f9fafb;
         }
+
         .quantity {
             min-width: 2rem;
         }
+
         .product-select-container button {
             transition: background-color 0.2s;
         }
+
         .product-list li {
             border-bottom: 1px solid #e5e7eb;
             padding-bottom: 8px;
             transition: background-color 0.2s;
         }
+
         .product-list li:last-child {
             border-bottom: none;
         }
+
         .product-list li.highlighted {
             background: #f0f5ff;
         }
+
         .thumbnail-list img {
             width: 80px;
             height: 80px;
@@ -57,16 +71,31 @@
             cursor: pointer;
             transition: transform 0.2s, border 0.2s;
         }
+
         .thumbnail-list img:hover {
             transform: scale(1.1);
             border: 2px solid var(--accent);
         }
+
         .thumbnail-list img.active {
             border: 2px solid var(--accent);
+        }
+
+        .toggle-button svg {
+            transition: transform 0.2s;
+        }
+
+        .next-step-button {
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .next-step-button:hover {
+            transform: scale(1.05);
         }
     </style>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
+
 <body class="antialiased text-gray-800 bg-gray-50 font-figtree">
     <div class="flex flex-col min-h-screen">
         <!-- Header Component -->
@@ -75,23 +104,34 @@
         <!-- Main Content -->
         <main class="flex-1 px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
             <!-- Ad Carousel -->
-            <button type="button" class="relative w-full mb-8 overflow-hidden text-left transition-shadow shadow-lg rounded-xl focus:outline-none hover:shadow-xl" onclick="onAdClick()">
+            <button type="button"
+                class="relative w-full mb-8 overflow-hidden text-left transition-shadow shadow-lg rounded-xl focus:outline-none hover:shadow-xl"
+                onclick="onAdClick()">
                 <img id="ad-banner" alt="廣告" class="object-cover w-full h-[50vh] rounded-xl">
                 <div class="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent">
                     <p id="ad-title" class="p-6 text-xl font-semibold text-white"></p>
                 </div>
             </button>
-
+        <!-- Progress Steps -->
+        <x-progress-steps :progress_list="['選擇商品', '確認配置', '確認訂單']" :current_step="0" />
             <!-- Categories -->
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-1">
                 @foreach ($categories as $category)
                     <x-category-card :category="$category" />
                 @endforeach
             </div>
+
+            <!-- Next Step Button -->
+            <!-- Next Step Form -->
+            <div class="mt-8 text-right">
+                <button class="w-full p-4 font-semibold text-white bg-gray-700 rounded-lg" id="next-step-button">
+                    下一步
+                </button>
+            </div>
         </main>
 
         <!-- Footer -->
-        <footer class="py-6 text-white bg-secondary">
+        <footer class="py-6 text-white bg-gray-800 bg-secondary">
             <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="flex flex-col items-center justify-between sm:flex-row">
                     <p>© 2025 讓兄弟組. All rights reserved.</p>
@@ -105,37 +145,21 @@
         </footer>
 
         <!-- Login Prompt Modal -->
-        <div id="login-prompt" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/60 backdrop-blur-sm">
+        <div id="login-prompt"
+            class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/60 backdrop-blur-sm">
             <div class="w-full max-w-md p-6 bg-white shadow-lg rounded-xl">
                 <h3 class="mb-4 text-xl font-semibold text-gray-900">請先登入</h3>
                 <p class="mb-6 text-gray-600">您需要登入才能選擇商品或加購選項。請登入或註冊以繼續。</p>
                 <div class="flex justify-end space-x-4">
-                    <a href="{{ route('user.login') }}" class="px-4 py-2 text-white rounded-md bg-accent hover:bg-blue-700">登入</a>
-                    <a href="{{ route('user.register') }}" class="px-4 py-2 text-white bg-gray-600 rounded-md hover:bg-gray-700">註冊</a>
+                    <a href="{{ route('user.login') }}"
+                        class="px-4 py-2 text-white rounded-md bg-accent hover:bg-blue-700">登入</a>
+                    <a href="{{ route('user.register') }}"
+                        class="px-4 py-2 text-white bg-gray-600 rounded-md hover:bg-gray-700">註冊</a>
                 </div>
             </div>
         </div>
 
-        <!-- Add-On Purchase Modal -->
-        <div id="addon-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/60 backdrop-blur-sm">
-            <div class="w-full max-w-lg p-6 bg-white shadow-lg rounded-xl">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-semibold text-gray-900">加購選項</h3>
-                    <button onclick="closeAddOnModal()" class="text-gray-500 hover:text-gray-700">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <div id="addon-content" class="max-h-[60vh] overflow-y-auto">
-                    <p class="text-gray-600">請選擇加購項目</p>
-                    <div id="addon-list" class="mt-4 space-y-4"></div>
-                </div>
-                <div class="flex justify-end mt-6">
-                    <button onclick="addSelectedAddOns()" class="px-4 py-2 text-white rounded-md bg-accent hover:bg-blue-700">確認加購</button>
-                </div>
-            </div>
-        </div>
+
     </div>
 
     <!-- Ad Carousel and Product Selection Script -->
@@ -144,7 +168,8 @@
         let ads = @json($ads);
         let index = 0;
         let ad = ads[index];
-        const selectedProducts = new Map(); // 儲存選擇的商品：{ categoryId-productId: { product_id, name, description, price, image, quantity, category_id } }
+        const selectedProducts =
+            new Map(); // 儲存選擇的商品：{ categoryId-productId: { product_id, name, description, price, image, quantity, category_id } }
 
         // 廣告輪播
         function updateAdImage() {
@@ -167,16 +192,28 @@
             try {
                 const response = await fetch('/api/products/compatibility', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ product_id: productId, accessory_id: accessoryId }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        accessory_id: accessoryId
+                    }),
                 });
                 const data = await response.json();
-                return response.ok
-                    ? { compatible: true, message: `與 ${categoryName} 相容` }
-                    : { compatible: false, message: data.error || `與 ${categoryName} 不相容` };
+                return response.ok ? {
+                    compatible: true,
+                    message: `與 ${categoryName} 相容`
+                } : {
+                    compatible: false,
+                    message: data.error || `與 ${categoryName} 不相容`
+                };
             } catch (error) {
                 console.error('相容性檢查失敗：', error);
-                return { compatible: false, message: `無法檢查與 ${categoryName} 的相容性` };
+                return {
+                    compatible: false,
+                    message: `無法檢查與 ${categoryName} 的相容性`
+                };
             }
         }
 
@@ -268,7 +305,8 @@
 
         // 更新商品顯示
         async function updateProductDisplay(categoryId) {
-            const card = document.querySelector(`.product-select-container[data-category-id="${categoryId}"]`).closest('section');
+            const card = document.querySelector(`.product-select-container[data-category-id="${categoryId}"]`).closest(
+                'section');
             const productList = card.querySelector('.product-list');
             const totalPriceElement = card.querySelector('.total-price');
             const thumbnailList = card.querySelector('.thumbnail-list');
@@ -300,30 +338,15 @@
 
                 // 添加縮圖
                 const img = document.createElement('img');
-                img.src = product.image && product.image !== 'none'
-                    ? `/images/products/${product.image}.png?t=${Date.now()}`
-                    : `/images/icons/${categoryIcon}.png?t=${Date.now()}`;
+                img.src = product.image && product.image !== 'none' ?
+                    `/images/products/${product.image}.png?t=${Date.now()}` :
+                    `/images/icons/${categoryIcon}.png?t=${Date.now()}`;
                 img.alt = product.name || '類別圖示';
                 img.dataset.productId = product.product_id;
                 img.onclick = () => highlightProduct(categoryId, product.product_id);
                 thumbnailList.appendChild(img);
 
-                // 相容性檢查
-                const allContainers = document.querySelectorAll('.product-select-container');
-                for (let otherContainer of allContainers) {
-                    const otherCategoryId = otherContainer.dataset.categoryId;
-                    if (otherCategoryId !== categoryId) {
-                        for (let otherProduct of selectedProducts.values()) {
-                            if (otherProduct.category_id === otherCategoryId) {
-                                const otherCategoryName = otherContainer.closest('section').querySelector('h2').textContent;
-                                const compatibility = await checkCompatibility(product.product_id, otherProduct.product_id, otherCategoryName);
-                                if (!compatibility.compatible) {
-                                    li.innerHTML += `<p class="text-sm text-red-600">${compatibility.message}</p>`;
-                                }
-                            }
-                        }
-                    }
-                }
+
             }
 
             if (selectedCount === 0) {
@@ -339,14 +362,16 @@
 
             // 預設高亮第一個商品（如果有）
             if (selectedCount > 0) {
-                const firstProductId = Array.from(selectedProducts.values()).find(p => p.category_id === categoryId)?.product_id;
+                const firstProductId = Array.from(selectedProducts.values()).find(p => p.category_id === categoryId)
+                    ?.product_id;
                 if (firstProductId) highlightProduct(categoryId, firstProductId);
             }
         }
 
         // 高亮選定商品
         function highlightProduct(categoryId, productId) {
-            const card = document.querySelector(`.product-select-container[data-category-id="${categoryId}"]`).closest('section');
+            const card = document.querySelector(`.product-select-container[data-category-id="${categoryId}"]`).closest(
+                'section');
             const productItems = card.querySelectorAll('.product-item');
             const thumbnails = card.querySelectorAll('.thumbnail-list img');
 
@@ -359,93 +384,94 @@
             });
         }
 
-        // 加購模態框邏輯
-        async function openAddOnModal(categoryId) {
-            if (!isAuthenticated) {
-                document.getElementById('login-prompt').classList.remove('hidden');
-                return;
-            }
+        // 下一步：提交所有選中商品
+        // 下一步：提交所有選中商品
+        function goToNextStep(event) {
+            event?.preventDefault(); // Prevent default form submission if called from form
 
-            const modal = document.getElementById('addon-modal');
-            const addonList = document.getElementById('addon-list');
-            addonList.innerHTML = '<p class="text-gray-500">正在載入加購項目...</p>';
-
-            modal.classList.remove('hidden');
-
-            try {
-                const response = await fetch(`https://api.qiushawa.studio/addons/category?id=${categoryId}`);
-                if (!response.ok) throw new Error('無法載入加購項目');
-                const data = await response.json();
-                const addons = data.addons || [];
-
-                addonList.innerHTML = '';
-                if (addons.length === 0) {
-                    addonList.innerHTML = '<p class="text-gray-600">此類別暫無加購項目</p>';
-                    return;
-                }
-
-                addons.forEach(addon => {
-                    const addonItem = document.createElement('div');
-                    addonItem.className = 'flex items-center justify-between p-3 border border-gray-200 rounded-md';
-                    addonItem.innerHTML = `
-                        <div class="flex items-center space-x-3">
-                            <input type="checkbox" class="addon-checkbox" value="${addon.addon_id}" data-price="${addon.addon_price}" data-name="${addon.addon_name}">
-                            <span>${addon.addon_name}</span>
-                        </div>
-                        <span class="text-gray-600">NT$${addon.addon_price}</span>
-                    `;
-                    addonList.appendChild(addonItem);
-                });
-            } catch (error) {
-                console.error('載入加購項目失敗：', error);
-                addonList.innerHTML = '<p class="text-red-600">無法載入加購項目，請稍後再試</p>';
-            }
-        }
-
-        function closeAddOnModal() {
-            document.getElementById('addon-modal').classList.add('hidden');
-        }
-
-        async function addSelectedAddOns() {
-            if (!isAuthenticated) {
-                document.getElementById('login-prompt').classList.remove('hidden');
-                return;
-            }
-
-            const checkboxes = document.querySelectorAll('.addon-checkbox:checked');
-            const selectedAddOns = Array.from(checkboxes).map(cb => ({
-                id: cb.value,
-                name: cb.dataset.name,
-                price: cb.dataset.price,
+            const selectedItems = Array.from(selectedProducts.values()).map(product => ({
+                product_id: product.product_id,
+                quantity: product.quantity
             }));
 
-            if (selectedAddOns.length === 0) {
-                alert('請至少選擇一個加購項目');
+            if (selectedItems.length === 0) {
+                alert('請至少選擇一個商品');
                 return;
             }
 
-            try {
-                const response = await fetch('/api/cart/addons', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ addons: selectedAddOns }),
-                });
+            // Set the items in the hidden input
+            document.getElementById('items-input').value = JSON.stringify(selectedItems);
 
-                if (response.ok) {
-                    alert('加購項目已加入購物車');
-                    closeAddOnModal();
-                } else {
-                    throw new Error('無法加入加購項目');
-                }
-            } catch (error) {
-                console.error('加入加購項目失敗：', error);
-                alert('無法加入加購項目，請稍後再試');
-            }
+            // Submit the form
+            document.getElementById('next-step-form').submit();
         }
 
         // 初始化廣告輪播
         updateAdImage();
         setInterval(updateAdImage, 3000);
     </script>
+    <script>
+    // 收集所有已選擇商品的資料
+function collectSelectedProducts() {
+    const details = [];
+    let hasSelection = false;
+
+    // Iterate over selectedProducts Map
+    for (const [key, product] of selectedProducts) {
+        if (product.quantity > 0) {
+            details.push({
+                product_id: product.product_id,
+                quantity: product.quantity,
+                unit_price: product.price,
+                discount_amount: 0 // Adjust if you have discounts
+            });
+            hasSelection = true;
+        }
+    }
+
+    if (!hasSelection) {
+        alert('請至少選擇一個商品！');
+        return null;
+    }
+
+    return {
+        config_name: 'Custom Configuration ' + new Date().toLocaleString(),
+        details: details
+    };
+}
+
+    // 提交配置
+    async function submitConfiguration() {
+        const data = collectSelectedProducts();
+        if (!data) return;
+        console.log('提交的配置數據：', data);
+        try {
+            const response = await fetch('/custom-configuration', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                // 跳轉到確認頁面
+                window.location.href = `/configuration/${result.configuration_id}`;
+            } else {
+                alert('提交失敗：' + result.message);
+            }
+        } catch (error) {
+            console.error('提交錯誤：', error);
+            alert('發生錯誤，請稍後重試。');
+        }
+    }
+
+    // 綁定“下一步”按鈕
+    document.getElementById('next-step-button').addEventListener('click', submitConfiguration);
+</script>
 </body>
+
 </html>

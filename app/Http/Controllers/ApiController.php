@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 use App\Models\ProductCategorie;
+use App\Models\CustomConfiguration;
+use App\Models\ConfigurationDetail;
 
 
 class ApiController extends Controller
@@ -56,4 +58,9 @@ class ApiController extends Controller
             'online_users' => $onlineUsers,
         ]);
     }
+
+    /**
+     * 提交組裝服務
+     */
+    
 }

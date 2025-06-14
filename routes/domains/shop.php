@@ -7,6 +7,7 @@ use App\Http\Controllers\Shop\AuthController;
 use App\Http\Controllers\Shop\UserProfileController;
 use App\Http\Controllers\Shop\UserOrderController;
 use App\Http\Controllers\Shop\UserSettingsController;
+use App\Http\Controllers\Shop\ConfigurationController;
 
 
 Route::domain('shop.qiushawa.studio')->group(function () {
@@ -28,8 +29,8 @@ Route::domain('shop.qiushawa.studio')->group(function () {
     // 需要身份驗證的路由
     Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', function () {
-    return view('dashboard'); // Create a dashboard.blade.php with an overview
-})->name('user.dashboard')->middleware('auth');
+            return view('dashboard'); // Create a dashboard.blade.php with an overview
+        })->name('user.dashboard')->middleware('auth');
         // Profile Routes
         Route::get('/profile', [UserProfileController::class, 'show'])->name('user.profile');
         Route::post('/profile', [UserProfileController::class, 'update'])->name('user.profile.update');
@@ -41,5 +42,13 @@ Route::domain('shop.qiushawa.studio')->group(function () {
         // Order Routes
         Route::get('/orders', [UserOrderController::class, 'index'])->name('user.orders');
         Route::get('/orders/{order_id}', [UserOrderController::class, 'show'])->name('user.order.show');
+
+
+
+Route::post('/custom-configuration', [ConfigurationController::class, 'submitCustomConfiguration'])->name('configuration.submit');
+    Route::get('/configuration/{config_id}', [ConfigurationController::class, 'showConfiguration'])->name('configuration.show');
+    Route::patch('/configuration/{config_id}/discounts', [ConfigurationController::class, 'updateDiscounts'])->name('configuration.updateDiscounts');
+    Route::get('/order/confirm/{config_id}', [ConfigurationController::class, 'showOrderConfirmation'])->name('order.confirm');
+    Route::post('/order/submit/{config_id}', [ConfigurationController::class, 'submitOrder'])->name('order.submit');
     });
 });

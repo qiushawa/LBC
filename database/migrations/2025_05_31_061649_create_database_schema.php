@@ -185,6 +185,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id'); // 使用者編號
             $table->string('config_name', 50); // 配置名稱
             $table->integer('total_price'); // 總價，含折扣
+            $table->string('order_id')->nullable();
             $table->timestamps(); // 建立時間、更新時間
             $table->foreign('user_id')->references('id')->on('users')->onDelete('restrict');
             $table->engine = 'InnoDB';

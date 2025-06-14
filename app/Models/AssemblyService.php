@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class AssemblyService extends Model
 {
     protected $primaryKey = 'service_id';
-    public $timestamps = true;
+    public $timestamps = false;
     protected $table = 'assembly_services';
     protected $fillable = [
         "service_name",
@@ -16,13 +16,13 @@ class AssemblyService extends Model
         "availability_status",
     ];
 
-    public function assemblyService()
+    public function orders()
     {
-        return $this->belongsTo(AssemblyService::class, 'service_id');
+        return $this->hasMany(Order::class, 'service_id', 'service_id');
     }
 
-    public function orderDetails()
+    public function configurations()
     {
-        return $this->hasMany(OrderDetail::class, 'order_id');
+        return $this->hasMany(CustomConfiguration::class, 'service_id', 'service_id');
     }
 }
