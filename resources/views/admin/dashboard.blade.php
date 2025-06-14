@@ -62,6 +62,17 @@
                                 庫存管理
                             </a>
                         </li>
+                        <!-- 新增折價管理 -->
+                        <li>
+                            <a href="{{ route('admin.discounts') }}"
+                                class="flex items-center p-3 rounded-lg {{ Route::currentRouteName() == 'admin.discounts' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} transition-colors">
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92-.82-.82c-.55.55-1.44.55-1.99 0s-.55-1.44 0-1.99l.82-.82-.92-.9c-.55-.55-.55-1.44 0-1.99s1.44-.55 1.99 0l.9.92.82-.82c.55-.55 1.44-.55 1.99 0s.55 1.44 0 1.99l-.82.82.92.9c.55.55.55 1.44 0 1.99s-1.44.55-1.99 0z" />
+                                </svg>
+                                折價管理
+                            </a>
+                        </li>
                     @endcan
                     <li>
                         <a href="{{ route('admin.inventory.search') }}"
@@ -128,6 +139,10 @@
                 @if (Route::currentRouteName() == 'admin.inventory.search')
                     @include('admin.inventory.search')
                 @endif
+                <!-- 新增折價管理頁面 -->
+                @if (Route::currentRouteName() == 'admin.discounts')
+                    @include('admin.discounts.index')
+                @endif
             </div>
         </div>
 
@@ -154,10 +169,14 @@
                                 class="flex items-center p-3 rounded-lg {{ Route::currentRouteName() == 'admin.ads' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">廣告管理</a>
                         </li>
                         <li><a href="{{ route('admin.products') }}"
-                                class="flex items-center p-3 rounded-lg {{ Route::currentRouteName() == 'admin.products' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">上架產品</a>
+                                class="flex items-center p-3 rounded-lg {{ Route::currentRouteName() == 'admin.products' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">產品管理</a>
                         </li>
                         <li><a href="{{ route('admin.inventory') }}"
                                 class="flex items-center p-3 rounded-lg {{ Route::currentRouteName() == 'admin.inventory' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">庫存管理</a>
+                        </li>
+                        <!-- 新增折價管理 -->
+                        <li><a href="{{ route('admin.discounts') }}"
+                                class="flex items-center p-3 rounded-lg {{ Route::currentRouteName() == 'admin.discounts' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">折價管理</a>
                         </li>
                     @endcan
                     <li><a href="{{ route('admin.inventory.search') }}"

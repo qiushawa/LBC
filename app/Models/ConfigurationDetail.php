@@ -22,4 +22,5 @@ class ConfigurationDetail extends Model
     {
         return $this->belongsTo(CustomConfiguration::class, 'config_id');
     }
+
 }

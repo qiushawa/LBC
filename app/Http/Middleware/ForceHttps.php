@@ -12,7 +12,6 @@ class ForceHttps
         if (!$request->secure() && app()->environment('production')) {
             return redirect()->secure($request->getRequestUri());
         }
-
         return $next($request);
     }
 }

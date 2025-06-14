@@ -46,8 +46,8 @@ class Product extends Model
     {
         return $this->hasMany(OrderDetail::class, 'product_id', 'product_id');
     }
-    public function discounts()
+public function discounts()
     {
-        return $this->hasMany(Discount::class, 'product_id', 'product_id');
+        return $this->belongsToMany(Discount::class, 'discount_product_mappings', 'product_id', 'discount_id');
     }
 }

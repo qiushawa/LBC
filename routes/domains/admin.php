@@ -4,7 +4,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\AdController;
-
+use App\Http\Controllers\Admin\DiscountController;
 use Illuminate\Support\Facades\Route;
 
 $domain = config('app.domains.admin', 'admin.qiushawa.studio');
@@ -23,6 +23,7 @@ Route::domain($domain)->group(function () {
 
         Route::get('/employee-images/{filename}', [EmployeeController::class, 'serveImage'])->name('employee.image');
         Route::post('/employee/upload-image', [EmployeeController::class, 'uploadImage'])->name('employee.upload-image');
+        Route::get('/dashboard/inventorySearch', [DashboardController::class, 'inventorySearch'])->name('admin.inventory.search');
 
         Route::middleware('can:manage-employees')->group(function () {
             Route::get('/dashboard/employees', [EmployeeController::class, 'index'])->name('admin.employees');
@@ -56,10 +57,13 @@ Route::domain($domain)->group(function () {
             Route::patch('/dashboard/inventory/{inventory}', [DashboardController::class, 'updateInventory'])->name('admin.inventory.update');
 
             // 庫存查詢
-            Route::get('/dashboard/inventorySearch', [DashboardController::class, 'inventorySearch'])->name('admin.inventory.search');
 
+            Route::get('/dashboard/discounts', [DiscountController::class, 'index'])->name('admin.discounts');
+            Route::get('/dashboard/discounts/create', [DiscountController::class, 'create'])->name('admin.discounts.create');
+            Route::post('/dashboard/discounts', [DiscountController::class, 'store'])->name('admin.discounts.store');
+            Route::get('/dashboard/discounts/{id}/edit', [DiscountController::class, 'edit'])->name('admin.discounts.edit');
+            Route::put('/dashboard/discounts/{id}', [DiscountController::class, 'update'])->name('admin.discounts.update');
+            Route::delete('/dashboard/discounts/{id}', [DiscountController::class, 'destroy'])->name('admin.discounts.destroy');
         });
-
-
     });
 });

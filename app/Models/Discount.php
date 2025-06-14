@@ -16,4 +16,5 @@ class Discount extends Model
     {
         return $this->belongsToMany(Product::class, 'discount_product_mappings', 'discount_id', 'product_id');
     }
+
 }

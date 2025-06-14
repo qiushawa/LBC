@@ -162,86 +162,93 @@ class ConfigurationController extends Controller
             'redirect' => route('order.confirm', ['config_id' => $config_id, 'service_id' => $serviceId]),
         ]);
     }
-public function showOrderConfirmation($config_id, Request $request)
-{
-    $configuration = CustomConfiguration::with('details.product', 'assemblyService')
-        ->where('user_id', $request->user()->id)
-        ->find($config_id);
+    public function showOrderConfirmation($config_id, Request $request)
+    {
+        $configuration = CustomConfiguration::with('details.product', 'assemblyService')
+            ->where('user_id', $request->user()->id)
+            ->find($config_id);
 
-    if (!$configuration) {
-        return redirect()->route('shop.index')->with('error', 'Configuration not found or does not belong to you.');
-    }
-
-    if ($configuration->order_id) {
-        return redirect()->route('shop.index')->with('error', 'This configuration has already been used to place an order.');
-    }
-
-    $service_id = $request->input('service_id', null);
-    $shipping_fee = 100;
-    $service = AssemblyService::find($service_id);
-    $configuration->service_id = $service_id;
-    $configuration->assemblyService = $service;
-
-    return response()
-        ->view('shop.order.confirm', compact('configuration', 'shipping_fee'))
-        ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
-}
-
-public function submitOrder($config_id, Request $request)
-{
-    $configuration = CustomConfiguration::with('details.product')
-        ->where('user_id', $request->user()->id)
-        ->find($config_id);
-
-    if (!$configuration) {
-        return redirect()->route('shop.index')->with('error', 'Configuration not found or does not belong to you.');
-    }
-
-    if ($configuration->order_id) {
-        return redirect()->route('shop.index')->with('error', 'This configuration has already been used to place an order.');
-    }
-
-    $data = $request->validate([
-        'recipient_name' => 'required|string|max:255',
-        'recipient_phone' => 'required|string|max:20',
-        'shipping_address' => 'required|string|max:255',
-        'payment_method' => 'required|in:credit_card,cash_on_delivery,bank_transfer,e_wallet',
-        'service_id' => 'nullable|exists:assembly_services,service_id',
-    ]);
-
-    $shipping_fee = 100;
-    $total_amount = $configuration->total_price + $shipping_fee;
-
-    return DB::transaction(function () use ($request, $configuration, $data, $shipping_fee, $total_amount) {
-        $order = Order::create([
-            'user_id' => $request->user()->id,
-            'order_date' => now(),
-            'order_status' => 'pending',
-            'total_amount' => $total_amount,
-            'shipping_fee' => $shipping_fee,
-            'recipient_name' => $data['recipient_name'],
-            'recipient_phone' => $data['recipient_phone'],
-            'shipping_address' => $data['shipping_address'],
-            'payment_method' => $data['payment_method'],
-            'payment_status' => 'unpaid',
-            'service_id' => $data['service_id'] ?? null,
-        ]);
-
-        foreach ($configuration->details as $detail) {
-            OrderDetail::create([
-                'order_id' => $order->order_id,
-                'product_id' => $detail->product_id,
-                'discount_id' => $detail->discount_id,
-                'quantity' => $detail->quantity,
-                'unit_price' => $detail->unit_price,
-                'discount_amount' => $detail->discount_amount,
-                'subtotal' => $detail->subtotal,
-            ]);
+        if (!$configuration) {
+            return redirect()->route('shop.index')->with('error', 'Configuration not found or does not belong to you.');
         }
 
-        $configuration->update(['order_id' => $order->order_id]);
+        if ($configuration->order_id) {
+            return redirect()->route('shop.index')->with('error', 'This configuration has already been used to place an order.');
+        }
 
-        return redirect()->route('shop.index')->with('success', 'Order placed successfully. Your order ID is ' . $order->order_id);
-    });
-}
+        $service_id = $request->input('service_id', null);
+        $shipping_fee = 100;
+        $service = AssemblyService::find($service_id);
+        $configuration->service_id = $service_id;
+        $configuration->assemblyService = $service;
+
+
+        return response()
+            ->view('shop.order.confirm', compact('configuration', 'shipping_fee'))
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    }
+
+    public function submitOrder($config_id, Request $request)
+    {
+        $configuration = CustomConfiguration::with('details.product')
+            ->where('user_id', $request->user()->id)
+            ->find($config_id);
+
+        if (!$configuration) {
+            return redirect()->route('shop.index')->with('error', 'Configuration not found or does not belong to you.');
+        }
+
+        if ($configuration->order_id) {
+            return redirect()->route('shop.index')->with('error', 'This configuration has already been used to place an order.');
+        }
+
+        $data = $request->validate([
+            'recipient_name' => 'required|string|max:255',
+            'recipient_phone' => 'required|string|max:20',
+            'shipping_address' => 'required|string|max:255',
+            'payment_method' => 'required|in:credit_card,cash_on_delivery,bank_transfer,e_wallet',
+            'service_id' => 'nullable|exists:assembly_services,service_id',
+        ]);
+
+        $shipping_fee = 100;
+        $total_amount = $configuration->total_price + $shipping_fee;
+
+        return DB::transaction(function () use ($request, $configuration, $data, $shipping_fee, $total_amount) {
+            // Create order
+            $order = Order::create([
+                'user_id' => $request->user()->id,
+                'order_date' => now(),
+                'order_status' => 'pending',
+                'total_amount' => $total_amount,
+                'shipping_fee' => $shipping_fee,
+                'recipient_name' => $data['recipient_name'],
+                'recipient_phone' => $data['recipient_phone'],
+                'shipping_address' => $data['shipping_address'],
+                'payment_method' => $data['payment_method'],
+                'payment_status' => 'unpaid',
+                'service_id' => $data['service_id'] ?? null,
+            ]);
+
+            // Create order details
+            foreach ($configuration->details as $detail) {
+                OrderDetail::create([
+                    'order_id' => $order->order_id,
+                    'product_id' => $detail->product_id,
+                    'discount_id' => $detail->discount_id,
+                    'quantity' => $detail->quantity,
+                    'unit_price' => $detail->unit_price,
+                    'discount_amount' => $detail->discount_amount,
+                    'subtotal' => $detail->subtotal,
+                ]);
+            }
+
+            // Delete CustomConfigurationDetail records
+            $configuration->details()->delete();
+
+            // Delete CustomConfiguration
+            $configuration->delete();
+
+            return redirect()->route('shop.index')->with('success', 'Order placed successfully. Your order ID is ' . $order->order_id);
+        });
+    }
 }

@@ -9,7 +9,7 @@
                         <div class="flex items-center justify-between mb-6">
                             <h2 class="text-2xl font-bold text-gray-900">訂單詳情 #{{ $order->order_id }}</h2>
                             <span class="text-sm font-medium {{ $order->order_status == 'completed' ? 'text-success' : ($order->order_status == 'canceled' ? 'text-error' : 'text-gray-600') }}">
-                                {{ __('order_status.' . $order->order_status) }}
+                                {{ $order->order_status}}
                             </span>
                         </div>
 
