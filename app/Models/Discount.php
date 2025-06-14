@@ -16,4 +16,13 @@ class Discount extends Model
         "start_date",
         "end_date",
     ];
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
+    }
+    public function orderDetails()
+    {
+        return $this->hasMany(OrderDetail::class, 'discount_id');
+    }
 }

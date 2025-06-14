@@ -1,8 +1,6 @@
 <?php
 
 namespace Database\Seeders;
-
-use App\Models\Product;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,13 +12,12 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             UserSeeder::class, // 使用者 Seeder
-            AdSeeder::class, // 廣告 Seeder
+            // AdSeeder::class, // 廣告 Seeder
             ProductCategorySeeder::class, // 產品類別 Seeder
             SupplierSeeder::class, // 供應商 Seeder
-            ProductSeeder::class,
+            // ProductSeeder::class,
             PermissionFactory::class, // 權限 Seeder
             EmployeeSeeder::class, // 員工
-
         ]);
     }
 }

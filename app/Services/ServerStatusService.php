@@ -26,16 +26,16 @@ class ServerStatusService
 
         return $status;
     }
-
     public function getOnlineUsers(): int
     {
         return Cache::remember('online_users', now()->addMinutes(5), function () {
             try {
                 return DB::table('sessions')
                     ->where('last_activity', '>=', now()->subMinutes(15)->getTimestamp())
+                    ->whereNotNull('user_id') // 只計算已登入用戶
                     ->count();
             } catch (Exception $e) {
-                Log::error('Failed to count online users: ' . $e->getMessage()); // Use Log::error
+                Log::error('Failed to count online users: ' . $e->getMessage());
                 return 0;
             }
         });

@@ -49,7 +49,7 @@
                                     <path
                                         d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 18H6V6h2v12zm4 0h-2V6h2v12zm4 0h-2V6h2v12z" />
                                 </svg>
-                                上架產品
+                                產品管理
                             </a>
                         </li>
                         <li>
@@ -120,22 +120,13 @@
                     @include('admin.ads.index')
                 @endif
                 @if (Route::currentRouteName() == 'admin.products')
-                    <div class="p-6 bg-white rounded-lg shadow-md">
-                        <h3 class="mb-4 text-lg font-semibold text-gray-800">上架產品</h3>
-                        <p class="text-gray-600">上架產品功能待實現...</p>
-                    </div>
+                    @include('admin.products.index')
                 @endif
                 @if (Route::currentRouteName() == 'admin.inventory')
-                    <div class="p-6 bg-white rounded-lg shadow-md">
-                        <h3 class="mb-4 text-lg font-semibold text-gray-800">庫存管理</h3>
-                        <p class="text-gray-600">庫存管理功能待實現...</p>
-                    </div>
+                    @include('admin.inventory.index')
                 @endif
                 @if (Route::currentRouteName() == 'admin.inventory.search')
-                    <div class="p-6 bg-white rounded-lg shadow-md">
-                        <h3 class="mb-4 text-lg font-semibold text-gray-800">庫存查詢</h3>
-                        <p class="text-gray-600">庫存查詢功能待實現...</p>
-                    </div>
+                    @include('admin.inventory.search')
                 @endif
             </div>
         </div>

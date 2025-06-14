@@ -11,4 +11,8 @@ Route::domain('api.qiushawa.studio')->group(function () {
             Route::get('/products/category', 'productsByCategory')
                 ->name('productsByCategory');
         });
+    // 獲取上線人數
+    Route::get('/status/online', [ApiController::class, 'getOnlineUsers'])
+        ->name('status.online');
+
 });

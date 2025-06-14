@@ -13,7 +13,7 @@
 
 <body>
     @if (isset($show_header) && $show_header)
-        @include('includes.header')
+        <x-header title="讓兄弟組 - 打造你的夢想電腦" />
     @endif
     <main>
         @yield('content')

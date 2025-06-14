@@ -45,4 +45,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Get the user's settings.
+     */
+    public function settings()
+    {
+        return $this->hasOne(UserSetting::class, 'user_id');
+    }
 }

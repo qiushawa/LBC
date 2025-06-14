@@ -30,4 +30,30 @@ class HomeController extends Controller
             ]))->convert($ad->ad_content)->getContent(),
         ]);
     }
+
+    public function showLogin()
+    {
+        return view('shop.auth.login');
+    }
+    public function login(Request $request)
+    {
+
+        return redirect()->route('shop.index');
+    }
+    public function logout(Request $request)
+    {
+        // 處理登出邏輯
+        // ...
+        return redirect()->route('shop.index');
+    }
+    public function showRegister()
+    {
+        return view('shop.register');
+    }
+    public function register(Request $request)
+    {
+        // 處理註冊邏輯
+        // ...
+        return redirect()->route('shop.index');
+    }
 }

@@ -1,10 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 use App\Models\ProductCategorie;
+
 
 class ApiController extends Controller
 {
@@ -29,11 +31,29 @@ class ApiController extends Controller
                 'error' => 'Category not found',
             ], 404);
         }
-
-        $products = $category->products()->get();
+        // 獲取該類別下的所有上架產品
+        $products = $category->products()->where('launch_status', 'active')->get();
         return response()->json([
             'category' => $category,
             'products' => $products,
+        ]);
+    }
+
+
+
+
+
+
+
+    /**
+     * 獲取上線人數
+     */
+    public function getOnlineUsers(Request $request): JsonResponse
+    {
+        // from ServiceProvider
+        $onlineUsers = app('cache')->get('online_users', 0);
+        return response()->json([
+            'online_users' => $onlineUsers,
         ]);
     }
 }

@@ -173,7 +173,6 @@ return new class extends Migration {
             $table->unsignedInteger('product_id'); // 商品編號
             $table->integer('stock_quantity'); // 庫存數量
             $table->integer('low_stock_threshold'); // 低庫存門檻
-            $table->timestamp('updated_at'); // 更新時間
             $table->foreign('product_id')->references('product_id')->on('products')->onDelete('cascade');
             $table->engine = 'InnoDB';
             $table->charset = 'utf8mb4';
@@ -221,21 +220,7 @@ return new class extends Migration {
             $table->collation = 'utf8mb4_unicode_ci';
         });
 
-        // 15. Product Compatibility Table
-        Schema::create('product_compatibility', function (Blueprint $table) {
-            $table->unsignedInteger('product_id'); // 商品編號
-            $table->unsignedInteger('accessory_id'); // 配件編號
-            $table->primary(['product_id', 'accessory_id']);
-            $table->boolean('compatibility_status'); // 相容性狀態
-            $table->string('compatibility_description', 4096); // 相容性說明，支援 Markdown
-            $table->foreign('product_id')->references('product_id')->on('products')->onDelete('cascade');
-            $table->foreign('accessory_id')->references('product_id')->on('products')->onDelete('cascade');
-            $table->engine = 'InnoDB';
-            $table->charset = 'utf8mb4';
-            $table->collation = 'utf8mb4_unicode_ci';
-        });
 
-        // 16. User Settings Table
         Schema::create('user_settings', function (Blueprint $table) {
             $table->unsignedBigInteger('setting_id')->autoIncrement()->primary(); // 設定編號
             $table->unsignedBigInteger('user_id')->unique(); // 使用者編號，唯一
@@ -257,7 +242,6 @@ return new class extends Migration {
                 inventory.product_id, -- 商品編號
                 inventory.stock_quantity, -- 庫存數量
                 inventory.low_stock_threshold, -- 低庫存門檻
-                inventory.updated_at, -- 更新時間
                 CASE
                     WHEN products.launch_status = 'inactive' THEN 'discontinued' -- 停售
                     WHEN inventory.stock_quantity = 0 THEN 'out_of_stock' -- 缺貨
@@ -274,7 +258,6 @@ return new class extends Migration {
         DB::statement('DROP VIEW IF EXISTS inventory_status_view');
 
         Schema::dropIfExists('user_settings');
-        Schema::dropIfExists('product_compatibility');
         Schema::dropIfExists('discount_product_mappings');
         Schema::dropIfExists('configuration_details');
         Schema::dropIfExists('custom_configurations');
