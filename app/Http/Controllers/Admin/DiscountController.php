@@ -64,8 +64,8 @@ $search = $request->input('search');
                 'discount_name' => $discount->discount_name,
                 'discount_type' => $discount->discount_type,
                 'discount_value' => $discount->discount_value,
-                'start_date' => $discount->start_date->format('Y-m-d'),
-                'end_date' => $discount->end_date->format('Y-m-d'),
+                'start_date' => $discount->start_date,
+                'end_date' => $discount->end_date,
                 'discount_description' => $discount->discount_description ?? '',
                 'products' => $discount->products->pluck('product_id')->toArray(),
             ]);

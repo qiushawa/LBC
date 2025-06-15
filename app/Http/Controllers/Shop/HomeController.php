@@ -5,22 +5,20 @@ use Illuminate\Http\Request;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProductCategorie;
-use App\Models\CustomConfiguration;
+
 use App\Models\Ad;
-use Illuminate\Support\Facades\Auth;
+
 
 class HomeController extends Controller
 {
     public function index(Request $request)
     {
         $categories = ProductCategorie::all();
-        $cart = CustomConfiguration::where("user_id", Auth::user()->id)->count();
         $ads = Ad::all();
 
         return view('shop.home', [
             'categories' => $categories,
-            'ads' => $ads,
-            'cart_count' => $cart,
+            'ads' => $ads
         ]);
 
     }
