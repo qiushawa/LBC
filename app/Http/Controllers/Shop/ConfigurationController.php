@@ -29,21 +29,19 @@ class ConfigurationController extends Controller
             'details.*.unit_price' => 'required|numeric|min:0',
             'details.*.discount_amount' => 'nullable|numeric|min:0',
         ]);
-        // Create a new custom configuration
+        // 建立新的客製化配置
         $configuration = CustomConfiguration::create([
             'user_id' => $request->user()->id,
             'config_name' => $data['config_name'],
-            'total_price' => 0, // Will be calculated later
+            'total_price' => 0,
         ]);
-
-        // Process each detail
         $totalPrice = 0;
+        // 處理配置細節
         foreach ($data['details'] as $detail) {
             $product = Product::findOrFail($detail['product_id']);
-            $unitPrice = $detail['unit_price'] ?? $product->price; // Default to product price if not provided
+            $unitPrice = $detail['unit_price'] ?? $product->price;
             $subtotal = ($unitPrice - $detail['discount_amount']) * $detail['quantity'];
             $totalPrice += $subtotal;
-
             ConfigurationDetail::create([
                 'config_id' => $configuration->config_id,
                 'product_id' => $detail['product_id'],
@@ -53,10 +51,8 @@ class ConfigurationController extends Controller
                 'subtotal' => $subtotal,
             ]);
         }
-
-        // Update the total price of the configuration
+        // 更新配置的總價
         $configuration->update(['total_price' => $totalPrice]);
-
         return response()->json([
             'message' => 'Custom configuration submitted successfully.',
             'configuration_id' => $configuration->config_id,
@@ -67,16 +63,13 @@ class ConfigurationController extends Controller
         $configuration = CustomConfiguration::with('details.product', 'assemblyService')
             ->where('user_id', $request->user()->id)
             ->findOrFail($config_id);
-
         $productIds = $configuration->details->pluck('product_id')->unique();
         $discounts = Discount::whereHas('products', function ($query) use ($productIds) {
             $query->whereIn('products.product_id', $productIds);
         })
             ->with(['products' => function ($query) use ($productIds) {
                 $query->whereIn('products.product_id', $productIds);
-            }])
-            ->get()
-            ->flatMap(function ($discount) {
+            }])->get()->flatMap(function ($discount) {
                 return $discount->products->map(function ($product) use ($discount) {
                     return [
                         'discount_id' => $discount->discount_id,
@@ -89,11 +82,16 @@ class ConfigurationController extends Controller
                     ];
                 });
             });
-
-        // Default assembly service
+        // 預設組裝服務
         $assemblyService = AssemblyService::where('availability_status', 'available')->first();
-
-        return view('shop.configuration.show', compact('configuration', 'discounts', 'assemblyService'));
+        return view(
+            'shop.configuration.show',
+            compact(
+                'configuration',
+                'discounts',
+                'assemblyService'
+            )
+        );
     }
 
     public function updateDiscounts($config_id, Request $request): JsonResponse
@@ -167,22 +165,17 @@ class ConfigurationController extends Controller
         $configuration = CustomConfiguration::with('details.product', 'assemblyService')
             ->where('user_id', $request->user()->id)
             ->find($config_id);
-
         if (!$configuration) {
-            return redirect()->route('shop.index')->with('error', 'Configuration not found or does not belong to you.');
+            return redirect()->route('shop.index')->with('error', '未找到配置或配置不屬於你。');
         }
-
         if ($configuration->order_id) {
-            return redirect()->route('shop.index')->with('error', 'This configuration has already been used to place an order.');
+            return redirect()->route('shop.index')->with('error', '此配置已下訂單');
         }
-
         $service_id = $request->input('service_id', null);
-        $shipping_fee = 100;
+        $shipping_fee = 100; // 預設運費
         $service = AssemblyService::find($service_id);
         $configuration->service_id = $service_id;
         $configuration->assemblyService = $service;
-
-
         return response()
             ->view('shop.order.confirm', compact('configuration', 'shipping_fee'))
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
@@ -190,46 +183,47 @@ class ConfigurationController extends Controller
 
     public function submitOrder($config_id, Request $request)
     {
+        // 根據 config_id 取得當前使用者的客製化配置，並載入其細節與產品資料
         $configuration = CustomConfiguration::with('details.product')
             ->where('user_id', $request->user()->id)
             ->find($config_id);
-
+        // 若查無此配置，或此配置不屬於當前使用者，導回首頁並顯示錯誤訊息
         if (!$configuration) {
-            return redirect()->route('shop.index')->with('error', 'Configuration not found or does not belong to you.');
+            return redirect()->route('shop.index')->with('error', '未找到配置或配置不屬於你。');
         }
-
+        // 若該組合已經建立過訂單，不允許重複下單
         if ($configuration->order_id) {
-            return redirect()->route('shop.index')->with('error', 'This configuration has already been used to place an order.');
+            return redirect()->route('shop.index')->with('error', '此配置已下訂單，無法再次下單。');
         }
-
+        // 驗證前端送來的表單資料
         $data = $request->validate([
-            'recipient_name' => 'required|string|max:255',
-            'recipient_phone' => 'required|string|max:20',
-            'shipping_address' => 'required|string|max:255',
-            'payment_method' => 'required|in:credit_card,cash_on_delivery,bank_transfer,e_wallet',
-            'service_id' => 'nullable|exists:assembly_services,service_id',
+            'recipient_name' => 'required|string|max:255',       // 收件人姓名
+            'recipient_phone' => 'required|string|max:20',       // 收件人電話
+            'shipping_address' => 'required|string|max:255',     // 收件人地址
+            'payment_method' => 'required|in:credit_card,cash_on_delivery,bank_transfer,e_wallet', // 付款方式
+            'service_id' => 'nullable|exists:assembly_services,service_id', // 裝機服務（可選）
         ]);
-
+        // 設定固定運費
         $shipping_fee = 100;
+        // 計算總金額（商品總價 + 運費）
         $total_amount = $configuration->total_price + $shipping_fee;
-
+        // 使用資料庫交易，確保訂單建立過程中的資料一致性
         return DB::transaction(function () use ($request, $configuration, $data, $shipping_fee, $total_amount) {
-            // Create order
+            // 建立訂單主資料
             $order = Order::create([
                 'user_id' => $request->user()->id,
-                'order_date' => now(),
-                'order_status' => 'pending',
-                'total_amount' => $total_amount,
-                'shipping_fee' => $shipping_fee,
-                'recipient_name' => $data['recipient_name'],
-                'recipient_phone' => $data['recipient_phone'],
-                'shipping_address' => $data['shipping_address'],
-                'payment_method' => $data['payment_method'],
-                'payment_status' => 'unpaid',
-                'service_id' => $data['service_id'] ?? null,
+                'order_date' => now(),                            // 下單時間
+                'order_status' => 'pending',                      // 初始狀態為待處理
+                'total_amount' => $total_amount,                  // 總金額
+                'shipping_fee' => $shipping_fee,                  // 運費
+                'recipient_name' => $data['recipient_name'],      // 收件人姓名
+                'recipient_phone' => $data['recipient_phone'],    // 收件人電話
+                'shipping_address' => $data['shipping_address'],  // 寄送地址
+                'payment_method' => $data['payment_method'],      // 付款方式
+                'payment_status' => 'unpaid',                     // 初始為未付款
+                'service_id' => $data['service_id'] ?? null,      // 裝機服務 ID（可為 null）
             ]);
-
-            // Create order details
+            // 建立訂單細節（每個商品）
             foreach ($configuration->details as $detail) {
                 OrderDetail::create([
                     'order_id' => $order->order_id,
@@ -241,14 +235,12 @@ class ConfigurationController extends Controller
                     'subtotal' => $detail->subtotal,
                 ]);
             }
-
-            // Delete CustomConfigurationDetail records
+            // 刪除該組合的細節（代表已下單完成）
             $configuration->details()->delete();
-
-            // Delete CustomConfiguration
+            // 刪除該組合主體（表示這組合已不再可用）
             $configuration->delete();
-
-            return redirect()->route('shop.index')->with('success', 'Order placed successfully. Your order ID is ' . $order->order_id);
+            // 回到首頁並顯示成功訊息與訂單編號
+            return redirect()->route('shop.index')->with('success', '訂單已成功建立，訂單編號為：' . $order->order_id);
         });
     }
 }

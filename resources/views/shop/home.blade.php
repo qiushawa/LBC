@@ -146,7 +146,7 @@
 
         <!-- Login Prompt Modal -->
         <div id="login-prompt"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/60 backdrop-blur-sm">
             <div class="w-full max-w-md p-6 bg-white shadow-lg rounded-xl">
                 <h3 class="mb-4 text-xl font-semibold text-gray-900">請先登入</h3>
                 <p class="mb-6 text-gray-600">您需要登入才能選擇商品或加購選項。請登入或註冊以繼續。</p>

@@ -8,7 +8,7 @@
             <div class="mb-6">
                 <h2 class="text-2xl font-bold tracking-tight">讓兄弟組</h2>
             </div>
-            <nav>
+            <nav aria-label="Mobile sidebar navigation">
                 <ul class="space-y-2">
                     <li>
                         <a href="{{ route('admin.dashboard') }}"
@@ -20,7 +20,7 @@
                         </a>
                     </li>
                     @can('manage-employees')
-                        <li>
+                        <li> <!-- 員工管理 -->
                             <a href="{{ route('admin.employees') }}"
                                 class="flex items-center p-3 rounded-lg {{ Route::currentRouteName() == 'admin.employees' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} transition-colors">
                                 <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -32,7 +32,7 @@
                         </li>
                     @endcan
                     @can('manage-level-2')
-                        <li>
+                        <li> <!-- 廣告管理 -->
                             <a href="{{ route('admin.ads') }}"
                                 class="flex items-center p-3 rounded-lg {{ Route::currentRouteName() == 'admin.ads' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} transition-colors">
                                 <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -42,7 +42,7 @@
                                 廣告管理
                             </a>
                         </li>
-                        <li>
+                        <li> <!-- 產品管理 -->
                             <a href="{{ route('admin.products') }}"
                                 class="flex items-center p-3 rounded-lg {{ Route::currentRouteName() == 'admin.products' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} transition-colors">
                                 <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -52,7 +52,7 @@
                                 產品管理
                             </a>
                         </li>
-                        <li>
+                        <li> <!-- 庫存管理 -->
                             <a href="{{ route('admin.inventory') }}"
                                 class="flex items-center p-3 rounded-lg {{ Route::currentRouteName() == 'admin.inventory' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} transition-colors">
                                 <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -62,8 +62,7 @@
                                 庫存管理
                             </a>
                         </li>
-                        <!-- 新增折價管理 -->
-                        <li>
+                        <li><!-- 折價管理 -->
                             <a href="{{ route('admin.discounts') }}"
                                 class="flex items-center p-3 rounded-lg {{ Route::currentRouteName() == 'admin.discounts' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} transition-colors">
                                 <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -74,7 +73,7 @@
                             </a>
                         </li>
                     @endcan
-                    <li>
+                    <li> <!-- 庫存查詢 -->
                         <a href="{{ route('admin.inventory.search') }}"
                             class="flex items-center p-3 rounded-lg {{ Route::currentRouteName() == 'admin.inventory.search' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} transition-colors">
                             <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -154,7 +153,7 @@
                     <path d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-            <nav>
+            <nav aria-label="Mobile sidebar navigation">
                 <ul class="space-y-2">
                     <li><a href="{{ route('admin.dashboard') }}"
                             class="flex items-center p-3 rounded-lg {{ Route::currentRouteName() == 'admin.dashboard' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">網站狀態</a>
