@@ -107,13 +107,13 @@
             <button type="button"
                 class="relative w-full mb-8 overflow-hidden text-left transition-shadow shadow-lg rounded-xl focus:outline-none hover:shadow-xl"
                 onclick="onAdClick()">
-                <img id="ad-banner" alt="廣告" class="object-cover w-full h-[50vh] rounded-xl">
+                <img id="ad-banner" alt="廣告" class="object-cover h-[50vh] w-[65vw] rounded-xl">
                 <div class="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent">
                     <p id="ad-title" class="p-6 text-xl font-semibold text-white"></p>
                 </div>
             </button>
-        <!-- Progress Steps -->
-        <x-progress-steps :progress_list="['選擇商品', '確認配置', '確認訂單']" :current_step="0" />
+            <!-- Progress Steps -->
+            <x-progress-steps :progress_list="['選擇商品', '確認配置', '確認訂單']" :current_step="0" />
             <!-- Categories -->
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-1">
                 @foreach ($categories as $category)
@@ -411,67 +411,67 @@
         setInterval(updateAdImage, 3000);
     </script>
     <script>
-    // 收集所有已選擇商品的資料
-function collectSelectedProducts() {
-    const details = [];
-    let hasSelection = false;
+        // 收集所有已選擇商品的資料
+        function collectSelectedProducts() {
+            const details = [];
+            let hasSelection = false;
 
-    // Iterate over selectedProducts Map
-    for (const [key, product] of selectedProducts) {
-        if (product.quantity > 0) {
-            details.push({
-                product_id: product.product_id,
-                quantity: product.quantity,
-                unit_price: product.price,
-                discount_amount: 0 // Adjust if you have discounts
-            });
-            hasSelection = true;
-        }
-    }
-
-    if (!hasSelection) {
-        alert('請至少選擇一個商品！');
-        return null;
-    }
-
-    return {
-        config_name: 'Custom Configuration ' + new Date().toLocaleString(),
-        details: details
-    };
-}
-
-    // 提交配置
-    async function submitConfiguration() {
-        const data = collectSelectedProducts();
-        if (!data) return;
-        console.log('提交的配置數據：', data);
-        try {
-            const response = await fetch('/custom-configuration', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify(data)
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                // 跳轉到確認頁面
-                window.location.href = `/configuration/${result.configuration_id}`;
-            } else {
-                alert('提交失敗：' + result.message);
+            // Iterate over selectedProducts Map
+            for (const [key, product] of selectedProducts) {
+                if (product.quantity > 0) {
+                    details.push({
+                        product_id: product.product_id,
+                        quantity: product.quantity,
+                        unit_price: product.price,
+                        discount_amount: 0 // Adjust if you have discounts
+                    });
+                    hasSelection = true;
+                }
             }
-        } catch (error) {
-            console.error('提交錯誤：', error);
-            alert('發生錯誤，請稍後重試。');
-        }
-    }
 
-    // 綁定“下一步”按鈕
-    document.getElementById('next-step-button').addEventListener('click', submitConfiguration);
-</script>
+            if (!hasSelection) {
+                alert('請至少選擇一個商品！');
+                return null;
+            }
+
+            return {
+                config_name: 'Custom Configuration ' + new Date().toLocaleString(),
+                details: details
+            };
+        }
+
+        // 提交配置
+        async function submitConfiguration() {
+            const data = collectSelectedProducts();
+            if (!data) return;
+            console.log('提交的配置數據：', data);
+            try {
+                const response = await fetch('/configuration', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // 跳轉到確認頁面
+                    window.location.href = `/configuration/${result.configuration_id}`;
+                } else {
+                    alert('提交失敗：' + result.message);
+                }
+            } catch (error) {
+                console.error('提交錯誤：', error);
+                alert('發生錯誤，請稍後重試。');
+            }
+        }
+
+        // 綁定“下一步”按鈕
+        document.getElementById('next-step-button').addEventListener('click', submitConfiguration);
+    </script>
 </body>
 
 </html>
